@@ -45,7 +45,7 @@ func (s Scim) GetClients(start int, count int) ([]Client, error) {
 	}
 
 	resources := ClientResources{}
-	json.Unmarshal(body, &resources)
+	_ = json.Unmarshal(body, &resources)
 	return resources.Clients, nil
 }
 
@@ -56,7 +56,7 @@ func (s Scim) GetClient(clientID string) (*Client, error) {
 	}
 	if err == nil {
 		client := &Client{}
-		json.Unmarshal(body, client)
+		_ = json.Unmarshal(body, client)
 		return client, nil
 	}
 	return nil, err
@@ -97,7 +97,7 @@ func (s Scim) GetUsers(start int, count int) ([]User, error) {
 	}
 
 	resources := UserResources{}
-	json.Unmarshal(body, &resources)
+	_ = json.Unmarshal(body, &resources)
 	return resources.Users, nil
 }
 
@@ -109,7 +109,7 @@ func (s Scim) GetUser(userName string) (*User, error) {
 	}
 	if err == nil {
 		resources := UserResources{}
-		json.Unmarshal(body, &resources)
+		_ = json.Unmarshal(body, &resources)
 		if len(resources.Users) == 1 {
 			return &resources.Users[0], nil
 		}

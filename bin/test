@@ -1,0 +1,29 @@
+#!/bin/bash
+
+set -e
+
+ROOT_DIR=$(cd "$(dirname $0)/.." && pwd)
+
+function testStatus {
+  if [ $? -eq 0 ]; then
+    echo -e "\nTest Suite: ALL PASSED!"
+  else
+    echo -e "\nTest Suite: FAILED!"
+  fi
+}
+
+trap testStatus EXIT
+
+pushd "$ROOT_DIR" >/dev/null
+  echo -e "Formatting source code..."
+  go fmt "./..."
+
+  echo -e "Vetting for potential issues..."
+  go tool vet .
+  for file in $(find . \( -name "*.go" -not -iname "*test.go" \))
+  do
+    go tool vet -all -shadow=true $file
+  done
+
+  go test ./...
+popd >/dev/null
