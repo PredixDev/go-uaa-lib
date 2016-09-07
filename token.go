@@ -56,13 +56,13 @@ type TokenClaims struct {
 func (tc TokenClaims) IsValid() error {
 	now := time.Now().Unix()
 
-	if tc.ExpiresAt != 0 && now >= tc.ExpiresAt {
+	if tc.ExpiresAt <= 0 || now >= tc.ExpiresAt {
 		return errors.New("Token is expired")
 	}
-	if tc.IssuedAt != 0 && now < tc.IssuedAt {
+	if tc.IssuedAt <= 0 || now < tc.IssuedAt {
 		return errors.New("Token used before issued")
 	}
-	if tc.NotBefore != 0 && now < tc.NotBefore {
+	if tc.NotBefore <= 0 || now < tc.NotBefore {
 		return errors.New("Token is not valid yet")
 	}
 

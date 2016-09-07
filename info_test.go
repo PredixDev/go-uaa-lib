@@ -6,16 +6,15 @@ import (
 	"testing"
 
 	lib "github.com/PredixDev/go-uaa-lib"
+	. "github.com/onsi/gomega"
 )
 
-func TestServerSuccess(t *testing.T) {
+func TestInfoServerSuccess(t *testing.T) {
+	RegisterTestingT(t)
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.RequestURI() != "/login" {
-			t.Error("URL: expected /login, found", r.URL)
-		}
-		if r.Header.Get("Accept") != "application/json" {
-			t.Error("Accept header: expected application/json, found", r.Header.Get("Accept"))
-		}
+		Expect(r.URL.RequestURI()).To(Equal("/login"))
+		Expect(r.Header.Get("Accept")).To(Equal("application/json"))
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("{}"))
 	}))
@@ -23,13 +22,12 @@ func TestServerSuccess(t *testing.T) {
 
 	info := lib.NewInfoClient(server.URL, false, "")
 
-	err := info.Server()
-	if err != nil {
-		t.Error("Unexpected error: ", err)
-	}
+	Expect(info.Server()).To(BeNil())
 }
 
-func TestServerError(t *testing.T) {
+func TestInfoServerError(t *testing.T) {
+	RegisterTestingT(t)
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}))
@@ -38,7 +36,5 @@ func TestServerError(t *testing.T) {
 	info := lib.NewInfoClient(server.URL, false, "")
 
 	err := info.Server()
-	if err.Error() != "Invalid status response: 500" {
-		t.Errorf("Invalid response: expected 'Invalid status response: 500', found '%s'", err.Error())
-	}
+	Expect(err.Error()).To(Equal("Invalid status response: 500"))
 }
