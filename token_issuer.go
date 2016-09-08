@@ -63,13 +63,17 @@ func (ti TokenIssuer) RequestToken(params url.Values, scopes []string) (*TokenRe
 	request.SetBasicAuth(ti.ClientID, ti.clientSecret)
 
 	response, err := ti.httpClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+
 	if response.StatusCode >= http.StatusBadRequest {
 		return nil, fmt.Errorf("Invalid status response: %d", response.StatusCode)
 	}
-
 	if response.StatusCode == http.StatusNoContent || !strings.Contains(response.Header.Get("Content-Type"), "application/json") {
 		return nil, fmt.Errorf("Invalid response content type.")
 	}
+
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to read response body.")

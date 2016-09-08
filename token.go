@@ -8,7 +8,15 @@ import (
 	"time"
 )
 
-func GetTokenClaims(token string) (*TokenClaims, error) {
+var TokenClaimsFetcher TokenClaimsFactory = tokenClaimsFactory{}
+
+type TokenClaimsFactory interface {
+	New(string) (*TokenClaims, error)
+}
+
+type tokenClaimsFactory struct{}
+
+func (f tokenClaimsFactory) New(token string) (*TokenClaims, error) {
 	parts := strings.Split(token, ".")
 	if len(parts) != 3 {
 		return nil, errors.New("Token contains invalid number of segments")
