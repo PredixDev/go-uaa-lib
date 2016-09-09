@@ -3,6 +3,7 @@ package lib_test
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	lib "github.com/PredixDev/go-uaa-lib"
 	. "github.com/onsi/gomega"
@@ -68,6 +69,19 @@ func TestTokenResponseIsValid(t *testing.T) {
 		err: fmt.Errorf("Error"),
 	}
 	Expect(tr.IsValid()).To(BeFalse())
+
+	tr = lib.NewTokenResponse()
+	tr.Access = "Access Token"
+	tr.Refresh = "Refresh Token"
+	lib.TokenClaimsFetcher = fakeTokenClaimsFactory{
+		tc: &lib.TokenClaims{
+			ExpiresAt: time.Now().Unix() + 100000,
+			IssuedAt:  time.Now().Unix() - 1,
+			NotBefore: time.Now().Unix() - 1,
+		},
+		err: nil,
+	}
+	Expect(tr.IsValid()).To(BeTrue())
 
 	lib.TokenClaimsFetcher = oldTokenClaimsFetcher
 }

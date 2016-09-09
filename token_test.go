@@ -114,4 +114,10 @@ func TestTokenIsValid(t *testing.T) {
 	tc.IssuedAt = time.Now().Unix() - 1
 	tc.NotBefore = time.Now().Unix() - 1
 	Expect(tc.IsValid()).To(BeNil())
+
+	tc = lib.TokenClaims{}
+	tc.ExpiresAt = time.Now().Unix() + 100000
+	tc.IssuedAt = time.Now().Unix() - 1
+	tc.NotBefore = 0
+	Expect(tc.IsValid()).To(BeNil())
 }

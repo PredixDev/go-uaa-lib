@@ -28,11 +28,11 @@ func (info InfoClient) Server() error {
 	}
 	req.Header.Add("Accept", "application/json")
 	resp, err := info.Client.Do(req)
-	if resp.StatusCode >= http.StatusBadRequest {
-		return fmt.Errorf("Invalid status response: %d", resp.StatusCode)
-	}
 	if err != nil {
 		return err
+	}
+	if resp.StatusCode >= http.StatusBadRequest {
+		return fmt.Errorf("Invalid status response: %d", resp.StatusCode)
 	}
 	_ = resp.Body.Close()
 	return nil
