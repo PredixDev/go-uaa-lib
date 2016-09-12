@@ -93,7 +93,7 @@ func TestTokenIssuerClientCredentialsGrant(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		Expect(r.Header.Get("Authorization")).To(Equal("Basic " + base64.StdEncoding.EncodeToString([]byte("client-id:client-secret"))))
 
-		r.ParseForm()
+		_ = r.ParseForm()
 		Expect(r.Form.Get("grant_type")).To(Equal("client_credentials"))
 		Expect(r.Form["scope"]).To(ConsistOf("scope1", "scope2"))
 
@@ -119,7 +119,7 @@ func TestTokenIssuerPasswordGrant(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		Expect(r.Header.Get("Authorization")).To(Equal("Basic " + base64.StdEncoding.EncodeToString([]byte("client-id:client-secret"))))
 
-		r.ParseForm()
+		_ = r.ParseForm()
 		Expect(r.Form.Get("grant_type")).To(Equal("password"))
 		Expect(r.Form.Get("username")).To(Equal("user1"))
 		Expect(r.Form.Get("password")).To(Equal("password1"))

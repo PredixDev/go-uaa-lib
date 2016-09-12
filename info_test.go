@@ -47,8 +47,8 @@ func TestInfoServerInvalidURL(t *testing.T) {
 	file, _ := ioutil.TempFile(os.TempDir(), "test-cert-file")
 	defer os.Remove(file.Name())
 
-	file.WriteString(sampleCertificate)
-	file.Close()
+	_, _ = file.WriteString(sampleCertificate)
+	_ = file.Close()
 
 	info := lib.NewInfoClient("Invalid URL", false, file.Name())
 
