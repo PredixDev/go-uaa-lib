@@ -18,7 +18,7 @@ func (tr TokenResponse) IsValid() bool {
 	if !tr.IsPresent() {
 		return false
 	}
-	tc, err := TokenClaimsFetcher.New(tr.Access)
+	tc, err := TokenClaimsFactory.New(tr.Access)
 	if tc == nil || err != nil {
 		return false
 	}

@@ -36,7 +36,8 @@ func TestTokenResponseIsPresent(t *testing.T) {
 func TestTokenResponseIsValid(t *testing.T) {
 	RegisterTestingT(t)
 
-	var oldTokenClaimsFetcher = lib.TokenClaimsFetcher
+	var oldTokenClaimsFactory = lib.TokenClaimsFactory
+	defer func() { lib.TokenClaimsFactory = oldTokenClaimsFactory }()
 
 	tr := lib.NewTokenResponse()
 	tr.Access = "Access Token"
@@ -46,7 +47,7 @@ func TestTokenResponseIsValid(t *testing.T) {
 	tr = lib.NewTokenResponse()
 	tr.Access = "Access Token"
 	tr.Refresh = "Refresh Token"
-	lib.TokenClaimsFetcher = fakeTokenClaimsFactory{
+	lib.TokenClaimsFactory = fakeTokenClaimsFactory{
 		tc:  nil,
 		err: nil,
 	}
@@ -55,7 +56,7 @@ func TestTokenResponseIsValid(t *testing.T) {
 	tr = lib.NewTokenResponse()
 	tr.Access = "Access Token"
 	tr.Refresh = "Refresh Token"
-	lib.TokenClaimsFetcher = fakeTokenClaimsFactory{
+	lib.TokenClaimsFactory = fakeTokenClaimsFactory{
 		tc:  nil,
 		err: fmt.Errorf("Error"),
 	}
@@ -64,7 +65,7 @@ func TestTokenResponseIsValid(t *testing.T) {
 	tr = lib.NewTokenResponse()
 	tr.Access = "Access Token"
 	tr.Refresh = "Refresh Token"
-	lib.TokenClaimsFetcher = fakeTokenClaimsFactory{
+	lib.TokenClaimsFactory = fakeTokenClaimsFactory{
 		tc:  &lib.TokenClaims{},
 		err: fmt.Errorf("Error"),
 	}
@@ -73,7 +74,7 @@ func TestTokenResponseIsValid(t *testing.T) {
 	tr = lib.NewTokenResponse()
 	tr.Access = "Access Token"
 	tr.Refresh = "Refresh Token"
-	lib.TokenClaimsFetcher = fakeTokenClaimsFactory{
+	lib.TokenClaimsFactory = fakeTokenClaimsFactory{
 		tc: &lib.TokenClaims{
 			ExpiresAt: time.Now().Unix() + 100000,
 			IssuedAt:  time.Now().Unix() - 1,
@@ -82,8 +83,6 @@ func TestTokenResponseIsValid(t *testing.T) {
 		err: nil,
 	}
 	Expect(tr.IsValid()).To(BeTrue())
-
-	lib.TokenClaimsFetcher = oldTokenClaimsFetcher
 }
 
 func TestTokenResponseGetAccessToken(t *testing.T) {

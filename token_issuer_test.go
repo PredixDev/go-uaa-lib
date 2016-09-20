@@ -14,7 +14,7 @@ import (
 func TestTokenIssuerRequestTokenWithInvalidTarget(t *testing.T) {
 	RegisterTestingT(t)
 
-	ti := lib.NewTokenIssuer("Invalid URL", "", "", false, "")
+	ti := lib.TokenIssuerFactory.New("Invalid URL", "", "", false, "")
 	token, err := ti.RequestToken(url.Values{}, nil)
 
 	Expect(token).To(BeNil())
@@ -29,7 +29,7 @@ func TestTokenIssuerRequestTokenWithInvalidStatus(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ti := lib.NewTokenIssuer(server.URL, "", "", false, "")
+	ti := lib.TokenIssuerFactory.New(server.URL, "", "", false, "")
 	token, err := ti.RequestToken(url.Values{}, nil)
 
 	Expect(token).To(BeNil())
@@ -45,7 +45,7 @@ func TestTokenIssuerRequestTokenWithNoContent(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ti := lib.NewTokenIssuer(server.URL, "", "", false, "")
+	ti := lib.TokenIssuerFactory.New(server.URL, "", "", false, "")
 	token, err := ti.RequestToken(url.Values{}, nil)
 
 	Expect(token).To(BeNil())
@@ -62,7 +62,7 @@ func TestTokenIssuerRequestTokenWithInvalidContentType(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ti := lib.NewTokenIssuer(server.URL, "", "", false, "")
+	ti := lib.TokenIssuerFactory.New(server.URL, "", "", false, "")
 	token, err := ti.RequestToken(url.Values{}, nil)
 
 	Expect(token).To(BeNil())
@@ -79,7 +79,7 @@ func TestTokenIssuerRequestTokenWithInvalidBody(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ti := lib.NewTokenIssuer(server.URL, "", "", false, "")
+	ti := lib.TokenIssuerFactory.New(server.URL, "", "", false, "")
 	token, err := ti.RequestToken(url.Values{}, nil)
 
 	Expect(token).To(BeNil())
@@ -103,7 +103,7 @@ func TestTokenIssuerClientCredentialsGrant(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ti := lib.NewTokenIssuer(server.URL, "client-id", "client-secret", false, "")
+	ti := lib.TokenIssuerFactory.New(server.URL, "client-id", "client-secret", false, "")
 	token, err := ti.ClientCredentialsGrant([]string{"scope1", "scope2"})
 
 	Expect(err).To(BeNil())
@@ -131,7 +131,7 @@ func TestTokenIssuerPasswordGrant(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ti := lib.NewTokenIssuer(server.URL, "client-id", "client-secret", false, "")
+	ti := lib.TokenIssuerFactory.New(server.URL, "client-id", "client-secret", false, "")
 	token, err := ti.PasswordGrant("user1", "password1", nil)
 
 	Expect(err).To(BeNil())

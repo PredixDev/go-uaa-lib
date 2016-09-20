@@ -562,7 +562,7 @@ func TestScimDeleteUser(t *testing.T) {
 }
 
 func NewScim(url, tokenType, accessToken string) lib.Scim {
-	return lib.NewScim(FakeTarget{
+	return lib.ScimFactory.New(FakeTarget{
 		url: url,
 	}, FakeContext{
 		tokenType:   tokenType,

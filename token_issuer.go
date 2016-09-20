@@ -9,7 +9,13 @@ import (
 	"strings"
 )
 
-type TokenIssuer struct {
+type TokenIssuer interface {
+	ClientCredentialsGrant(scopes []string) (*TokenResponse, error)
+	PasswordGrant(username, password string, scopes []string) (*TokenResponse, error)
+	RequestToken(params url.Values, scopes []string) (*TokenResponse, error)
+}
+
+type tokenIssuer struct {
 	Target        string
 	ClientID      string
 	clientSecret  string
@@ -18,8 +24,16 @@ type TokenIssuer struct {
 	httpClient    *http.Client
 }
 
-func NewTokenIssuer(target, clientID, clientSecret string, skipSslValidation bool, caCertFile string) TokenIssuer {
-	return TokenIssuer{
+var TokenIssuerFactory TokenIssuerFactoryInterface = tokenIssuerFactory{}
+
+type TokenIssuerFactoryInterface interface {
+	New(target, clientID, clientSecret string, skipSslValidation bool, caCertFile string) TokenIssuer
+}
+
+type tokenIssuerFactory struct{}
+
+func (f tokenIssuerFactory) New(target, clientID, clientSecret string, skipSslValidation bool, caCertFile string) TokenIssuer {
+	return tokenIssuer{
 		Target:        target,
 		ClientID:      clientID,
 		clientSecret:  clientSecret,
@@ -29,14 +43,14 @@ func NewTokenIssuer(target, clientID, clientSecret string, skipSslValidation boo
 	}
 }
 
-func (ti TokenIssuer) ClientCredentialsGrant(scopes []string) (*TokenResponse, error) {
+func (ti tokenIssuer) ClientCredentialsGrant(scopes []string) (*TokenResponse, error) {
 	params := url.Values{
 		"grant_type": {"client_credentials"},
 	}
 	return ti.RequestToken(params, scopes)
 }
 
-func (ti TokenIssuer) PasswordGrant(username, password string, scopes []string) (*TokenResponse, error) {
+func (ti tokenIssuer) PasswordGrant(username, password string, scopes []string) (*TokenResponse, error) {
 	params := url.Values{
 		"grant_type": {"password"},
 		"username":   {username},
@@ -45,7 +59,7 @@ func (ti TokenIssuer) PasswordGrant(username, password string, scopes []string) 
 	return ti.RequestToken(params, scopes)
 }
 
-func (ti TokenIssuer) RequestToken(params url.Values, scopes []string) (*TokenResponse, error) {
+func (ti tokenIssuer) RequestToken(params url.Values, scopes []string) (*TokenResponse, error) {
 	tokenURL := ti.Target + "/oauth/token"
 
 	if len(scopes) > 0 {

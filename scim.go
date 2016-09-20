@@ -11,21 +11,43 @@ import (
 	"strconv"
 )
 
-type Scim struct {
+type Scim interface {
+	GetClients(start int, count int) ([]Client, error)
+	GetClient(clientID string) (*Client, error)
+	CreateClient(client *Client) error
+	PutClient(client *Client) error
+	DeleteClient(clientID string) error
+	GetUsers(start int, count int) ([]User, error)
+	GetUser(userName string) (*User, error)
+	CreateUser(user *User) error
+	PutUser(user *User) error
+	DeleteUser(userID string) error
+	Request(method, path string, body interface{}, headers map[string]string) (status int, responseBody []byte, err error)
+}
+
+type scim struct {
 	Target     string
 	Auth       string
 	httpClient *http.Client
 }
 
-func NewScim(target Target, context Context) Scim {
-	return Scim{
+var ScimFactory ScimFactoryInterface = scimFactory{}
+
+type ScimFactoryInterface interface {
+	New(target Target, context Context) Scim
+}
+
+type scimFactory struct{}
+
+func (f scimFactory) New(target Target, context Context) Scim {
+	return scim{
 		Target:     target.URL(),
 		Auth:       context.TokenType() + " " + context.AccessToken(),
 		httpClient: NewHTTPClient(NewTLSConfig(target.SkipSslVerify(), target.CaCertFile())),
 	}
 }
 
-func (s Scim) GetClients(start int, count int) ([]Client, error) {
+func (s scim) GetClients(start int, count int) ([]Client, error) {
 	var query string
 	if start > 0 {
 		query = fmt.Sprintf("?startIndex=%d", start)
@@ -49,7 +71,7 @@ func (s Scim) GetClients(start int, count int) ([]Client, error) {
 	return resources.Clients, nil
 }
 
-func (s Scim) GetClient(clientID string) (*Client, error) {
+func (s scim) GetClient(clientID string) (*Client, error) {
 	status, body, err := s.Request("GET", "/oauth/clients/"+clientID, nil, nil)
 	if status == http.StatusNotFound {
 		return nil, nil
@@ -62,22 +84,22 @@ func (s Scim) GetClient(clientID string) (*Client, error) {
 	return nil, err
 }
 
-func (s Scim) CreateClient(client *Client) error {
+func (s scim) CreateClient(client *Client) error {
 	_, _, err := s.Request("POST", "/oauth/clients", client, nil)
 	return err
 }
 
-func (s Scim) PutClient(client *Client) error {
+func (s scim) PutClient(client *Client) error {
 	_, _, err := s.Request("PUT", "/oauth/clients/"+client.ID, client, nil)
 	return err
 }
 
-func (s Scim) DeleteClient(clientID string) error {
+func (s scim) DeleteClient(clientID string) error {
 	_, _, err := s.Request("DELETE", "/oauth/clients/"+clientID, nil, nil)
 	return err
 }
 
-func (s Scim) GetUsers(start int, count int) ([]User, error) {
+func (s scim) GetUsers(start int, count int) ([]User, error) {
 	var query string
 	if start > 0 {
 		query = fmt.Sprintf("?startIndex=%d", start)
@@ -101,7 +123,7 @@ func (s Scim) GetUsers(start int, count int) ([]User, error) {
 	return resources.Users, nil
 }
 
-func (s Scim) GetUser(userName string) (*User, error) {
+func (s scim) GetUser(userName string) (*User, error) {
 	query := fmt.Sprintf("userName eq \"%s\"", userName)
 	status, body, err := s.Request("GET", "/Users?filter="+url.QueryEscape(query), nil, nil)
 	if status == http.StatusNotFound {
@@ -117,24 +139,24 @@ func (s Scim) GetUser(userName string) (*User, error) {
 	return nil, err
 }
 
-func (s Scim) CreateUser(user *User) error {
+func (s scim) CreateUser(user *User) error {
 	_, _, err := s.Request("POST", "/Users", user, nil)
 	return err
 }
 
-func (s Scim) PutUser(user *User) error {
+func (s scim) PutUser(user *User) error {
 	_, _, err := s.Request("PUT", "/Users/"+user.ID, user, map[string]string{
 		"If-Match": strconv.Itoa(user.Meta.Version),
 	})
 	return err
 }
 
-func (s Scim) DeleteUser(userID string) error {
+func (s scim) DeleteUser(userID string) error {
 	_, _, err := s.Request("DELETE", "/Users/"+userID, nil, nil)
 	return err
 }
 
-func (s Scim) Request(method, path string, body interface{}, headers map[string]string) (status int, responseBody []byte, err error) {
+func (s scim) Request(method, path string, body interface{}, headers map[string]string) (status int, responseBody []byte, err error) {
 	var bodyReader io.Reader
 	if body != nil {
 		bodyJSON, _ := json.Marshal(body)

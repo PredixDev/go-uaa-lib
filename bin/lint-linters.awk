@@ -4,4 +4,5 @@
     || /comment on exported type .+ should be of the form.*\(golint\)/ \
     || /error return value not checked \(defer .*\) \(errcheck\)/ \
     || /_test\.go.* error return value not checked \(w.Write.*\) \(errcheck\)/ \
+    || /libfakes\/fake_[A-Za-z0-9_]+.go.*/ \
 )

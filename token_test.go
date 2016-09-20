@@ -11,7 +11,7 @@ import (
 func TestGetTokenClaimsWithLessThan3Parts(t *testing.T) {
 	RegisterTestingT(t)
 
-	claims, err := lib.TokenClaimsFetcher.New("part1.part2")
+	claims, err := lib.TokenClaimsFactory.New("part1.part2")
 	Expect(claims).To(BeNil())
 	Expect(err.Error()).To(Equal("Token contains invalid number of segments"))
 }
@@ -19,7 +19,7 @@ func TestGetTokenClaimsWithLessThan3Parts(t *testing.T) {
 func TestGetTokenClaimsWithMoreThan3Parts(t *testing.T) {
 	RegisterTestingT(t)
 
-	claims, err := lib.TokenClaimsFetcher.New("part1.part2.part3.part4")
+	claims, err := lib.TokenClaimsFactory.New("part1.part2.part3.part4")
 	Expect(claims).To(BeNil())
 	Expect(err.Error()).To(Equal("Token contains invalid number of segments"))
 }
@@ -27,7 +27,7 @@ func TestGetTokenClaimsWithMoreThan3Parts(t *testing.T) {
 func TestGetTokenClaimsWithInvalidEncoding(t *testing.T) {
 	RegisterTestingT(t)
 
-	claims, err := lib.TokenClaimsFetcher.New("encoded_part1.encoded_part2.encoded_part3")
+	claims, err := lib.TokenClaimsFactory.New("encoded_part1.encoded_part2.encoded_part3")
 	Expect(claims).To(BeNil())
 	Expect(err.Error()).To(Equal("Failed to decode token claims"))
 }
@@ -35,7 +35,7 @@ func TestGetTokenClaimsWithInvalidEncoding(t *testing.T) {
 func TestGetTokenClaimsWithMalformedToken(t *testing.T) {
 	RegisterTestingT(t)
 
-	claims, err := lib.TokenClaimsFetcher.New("encoded_part1.ZW5jb2RlZF9wYXJ0Mg==.encoded_part3")
+	claims, err := lib.TokenClaimsFactory.New("encoded_part1.ZW5jb2RlZF9wYXJ0Mg==.encoded_part3")
 	Expect(claims).To(BeNil())
 	Expect(err.Error()).To(Equal("Malformed token"))
 }
@@ -43,7 +43,7 @@ func TestGetTokenClaimsWithMalformedToken(t *testing.T) {
 func TestGetTokenClaimsWithValidToken(t *testing.T) {
 	RegisterTestingT(t)
 
-	claims, err := lib.TokenClaimsFetcher.New("encoded_part1.ew0KICAianRpIjogIjEyMzQ1Njc4OTAiLA0KICAic3ViIjogIkFCQ0QiLA0KICAic2NvcGUiOiBbDQogICAgIm9wZW5pZCINCiAgXSwNCiAgImNsaWVudF9pZCI6ICJzb21lLWNsaWVudCIsDQogICJjaWQiOiAic29tZS1jbGllbnQiLA0KICAiYXpwIjogInNvbWUtY2xpZW50IiwNCiAgImdyYW50X3R5cGUiOiAicGFzc3dvcmQiLA0KICAidXNlcl9pZCI6ICJBQkNEIiwNCiAgIm9yaWdpbiI6ICJ1YWEiLA0KICAidXNlcl9uYW1lIjogInNvbWUtdXNlciIsDQogICJlbWFpbCI6ICJzb21lQHVzZXIuY29tIiwNCiAgImF1dGhfdGltZSI6IDE0NzMyMDUzMDUsDQogICJyZXZfc2lnIjogIjEyMzQiLA0KICAiaWF0IjogMTQ3MzIwNTMwNSwNCiAgImV4cCI6IDE0NzMyNDg1MDUsDQogICJpc3MiOiAiaHR0cHM6Ly9YWVoudWFhLmNvbS9vYXV0aC90b2tlbiIsDQogICJ6aWQiOiAiWFlaIiwNCiAgImF1ZCI6IFsNCiAgICAib3BlbmlkIiwNCiAgICAic29tZS1jbGllbnQiDQogIF0NCn0=.encoded_part3")
+	claims, err := lib.TokenClaimsFactory.New("encoded_part1.ew0KICAianRpIjogIjEyMzQ1Njc4OTAiLA0KICAic3ViIjogIkFCQ0QiLA0KICAic2NvcGUiOiBbDQogICAgIm9wZW5pZCINCiAgXSwNCiAgImNsaWVudF9pZCI6ICJzb21lLWNsaWVudCIsDQogICJjaWQiOiAic29tZS1jbGllbnQiLA0KICAiYXpwIjogInNvbWUtY2xpZW50IiwNCiAgImdyYW50X3R5cGUiOiAicGFzc3dvcmQiLA0KICAidXNlcl9pZCI6ICJBQkNEIiwNCiAgIm9yaWdpbiI6ICJ1YWEiLA0KICAidXNlcl9uYW1lIjogInNvbWUtdXNlciIsDQogICJlbWFpbCI6ICJzb21lQHVzZXIuY29tIiwNCiAgImF1dGhfdGltZSI6IDE0NzMyMDUzMDUsDQogICJyZXZfc2lnIjogIjEyMzQiLA0KICAiaWF0IjogMTQ3MzIwNTMwNSwNCiAgImV4cCI6IDE0NzMyNDg1MDUsDQogICJpc3MiOiAiaHR0cHM6Ly9YWVoudWFhLmNvbS9vYXV0aC90b2tlbiIsDQogICJ6aWQiOiAiWFlaIiwNCiAgImF1ZCI6IFsNCiAgICAib3BlbmlkIiwNCiAgICAic29tZS1jbGllbnQiDQogIF0NCn0=.encoded_part3")
 	Expect(claims).ToNot(BeNil())
 	Expect(err).To(BeNil())
 

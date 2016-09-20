@@ -8,10 +8,10 @@ import (
 	"time"
 )
 
-var TokenClaimsFetcher TokenClaimsFactory = tokenClaimsFactory{}
+var TokenClaimsFactory TokenClaimsFactoryInterface = tokenClaimsFactory{}
 
-type TokenClaimsFactory interface {
-	New(string) (*TokenClaims, error)
+type TokenClaimsFactoryInterface interface {
+	New(token string) (*TokenClaims, error)
 }
 
 type tokenClaimsFactory struct{}
