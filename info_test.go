@@ -22,7 +22,7 @@ func TestInfoServerSuccess(t *testing.T) {
 	}))
 	defer server.Close()
 
-	info := lib.NewInfoClient(server.URL, false, "")
+	info := lib.InfoClientFactory.New(server.URL, false, "")
 
 	Expect(info.Server()).To(BeNil())
 }
@@ -35,7 +35,7 @@ func TestInfoServerError(t *testing.T) {
 	}))
 	defer server.Close()
 
-	info := lib.NewInfoClient(server.URL, false, "")
+	info := lib.InfoClientFactory.New(server.URL, false, "")
 
 	err := info.Server()
 	Expect(err.Error()).To(Equal("Invalid status response: 500"))
@@ -50,7 +50,7 @@ func TestInfoServerInvalidURL(t *testing.T) {
 	_, _ = file.WriteString(sampleCertificate)
 	_ = file.Close()
 
-	info := lib.NewInfoClient("Invalid URL", false, file.Name())
+	info := lib.InfoClientFactory.New("Invalid URL", false, file.Name())
 
 	err := info.Server()
 	Expect(err).ToNot(BeNil())
